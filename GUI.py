@@ -5,21 +5,26 @@ from time import time
 result="error"#默认返回结果
 state="encrypt"#默认为加密模式
 input_mode="bits"#默认为二进制数输入模式
+Locked_Correct_key:bool=False
 all_mingwen:list[str]=[]#存储破解模式中接收到的明文组
 all_miwen:list[str]=[]#存储破解模式中接收到的密文组
 possible_key:list[str]=[]#存储可能的密钥
 def Violent_Crack():
-    #print("获取到的明文列表",all_mingwen)
-    #print("获取到的密文列表",all_miwen)
+    global Locked_Correct_key
+    Locked_Correct_key=False
+    print("获取到的明文列表",all_mingwen)
+    print("获取到的密文列表",all_miwen)
     start_time=time()
     for k in range(len(all_mingwen)):
-        test_mingwen=all_mingwen[k]
-        test_miwen=all_miwen[k]
-        #print("现在正在对明密文对",test_mingwen,test_miwen,"进行破解尝试")
-        find_possbile_key(test_mingwen,test_miwen)
+        if Locked_Correct_key==False:
+            test_mingwen=all_mingwen[k]
+            test_miwen=all_miwen[k]
+            print(f"正在对第{k+1}对明密文进行破解")
+            find_possbile_key(test_mingwen,test_miwen)
+            print("现在可能的密钥有",possible_key)
     end_time=time()
     run_time=end_time-start_time
-    print(len(possible_key))
+    #print(len(possible_key))
     if len(possible_key)==1:
         messagebox.showinfo("提示","破解用时{}\n密钥为{}".format(run_time,possible_key))
     elif len(possible_key)==0:
@@ -30,13 +35,12 @@ def Violent_Crack():
             str1=str1+"或"+possible_key[i+1]
         tk.Tk().withdraw()
         messagebox.showinfo("提示",str1+f"\n破解用时{run_time}")
-        
-            
-  
+    possible_key.clear()
 def find_possbile_key(mingwen,miwen):
+    global Locked_Correct_key
     i=0
     global possible_key
-    while i<1024:#最大的10位二进制数转换为十进制即为1023
+    while i<1024:#最大的10位二进制数转换为十进制即为2047
         test_key=bin(i)
         test_key=test_key[2:]#去标志位"0b"
         length=len(test_key)
@@ -50,12 +54,16 @@ def find_possbile_key(mingwen,miwen):
             else:#一旦出现重复即可确定唯一正确的密钥
                 possible_key.clear()
                 possible_key.append(test_key)
+                print("已经锁定唯一正确的密钥",test_key)
+                Locked_Correct_key=True
                 break
         i+=1
 def clear_records():
     global all_mingwen,all_miwen
     all_miwen.clear()
     all_mingwen.clear()
+    possible_key.clear()
+    print(all_mingwen,all_mingwen)
     tk.Tk().withdraw()
     messagebox.showinfo("提示","已经清除所有信息")
 
