@@ -36,7 +36,7 @@ def Violent_Crack():
 def find_possbile_key(mingwen,miwen):
     i=0
     global possible_key
-    while i<1024:#最大的10位二进制数转换为十进制即为2047
+    while i<1024:#最大的10位二进制数转换为十进制即为1023
         test_key=bin(i)
         test_key=test_key[2:]#去标志位"0b"
         length=len(test_key)
